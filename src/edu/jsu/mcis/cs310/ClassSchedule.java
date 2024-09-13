@@ -2,8 +2,10 @@ package edu.jsu.mcis.cs310;
 
 import com.github.cliftonlabs.json_simple.*;
 import com.opencsv.*;
+import com.opencsv.exceptions.CsvException;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClassSchedule {
     
@@ -33,9 +37,37 @@ public class ClassSchedule {
     private final String SUBJECTID_COL_HEADER = "subjectid";
     
     public String convertCsvToJsonString(List<String[]> csv) {
-        
-        return ""; // remove this!
-        
+        String result  = "";
+        try {
+            CSVReader csvReader = new CSVReader(new StringReader(getCsvString(csv)));
+            List<String[]> full = csvReader.readAll();
+            Iterator<String[]> iterator = full.iterator();
+            
+            
+            
+            JsonObject main = new JsonObject();
+            JsonObject schedule = new JsonObject();
+            JsonObject course = new JsonObject();
+            
+            JsonArray section = new JsonArray();
+            JsonArray colheaders = new JsonArray();
+            
+            for (String string : iterator.next()){
+                colheaders.add(string);
+               System.out.println(string);
+            }
+           
+
+            
+            
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(ClassSchedule.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CsvException ex) {
+            Logger.getLogger(ClassSchedule.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result; // remove this!
     }
     
     public String convertJsonToCsvString(JsonObject json) {
