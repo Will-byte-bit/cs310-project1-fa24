@@ -67,18 +67,22 @@ public class ClassSchedule {
                 colheaders.add(string);
   
             }
-           
-                //runs while more
+          
             while(iterator.hasNext()){
-               
+                
                 String[] rows = iterator.next();
+               
+                 //testing if num and only abrev, IE acc, is held within subject.
+                String numShort = rows[2].substring(0, rows[2].length()-3);
+                String subjectId = numShort;
+                String num = rows[2].substring(numShort.length());
+                int credits = Integer.parseInt(rows[6]);
                 
               
                 if(!scheduleType.containsKey(rows[5])){
                     scheduleType.put(rows[5], rows[11]);
                 }
-                //testing if num and only abrev, IE acc, is held within subject.
-                String numShort = rows[2].substring(0, rows[2].length()-3);
+               
                 if(!subject.containsKey(numShort)){
                     subject.put(numShort, rows[1]);
                 }
@@ -86,13 +90,11 @@ public class ClassSchedule {
                 if(!course.containsKey(rows[2])){
                    
                     JsonObject subCourse = new JsonObject();
-                    String subjectId = numShort;
-                    String num = rows[2].substring(numShort.length());
-                    int credits = Integer.parseInt(rows[6]);
+      
                     
                     //possibly change to use colheaders
                     subCourse.put("subjectid", subjectId);
-                    subCourse.put("num", numShort);
+                    subCourse.put("num", num);
                     subCourse.put("description", rows[3]);
                     subCourse.put("credits", credits);
                     
@@ -100,15 +102,43 @@ public class ClassSchedule {
                     
                    course.put(rows[2], subCourse);
                 }
-                for(String string : rows){
-                   
+                JsonObject subSection = new JsonObject();
+                subSection.put("crn", Integer.parseInt(rows[0]));
+                subSection.put("subjectid", subjectId);
+                subSection.put("num", num);
+                subSection.put("section", rows[4]);
+                subSection.put("type", rows[5]);
+                subSection.put("start", rows[7]);
+                subSection.put("end", rows[8]);
+                subSection.put("days", rows[9]);
+                subSection.put("where", rows[10]);
+                
+                JsonArray teachers = new JsonArray();
+                
+                //creates list of teachers from row data
+                CSVReader reader2 = new CSVReaderBuilder(new StringReader(rows[11])).withCSVParser(new CSVParserBuilder().withSeparator(',').build()).build();
+                List<String[]> csv2 = reader2.readAll();
+                Iterator<String[]> iterator2 = csv2.iterator();
+                
+                //runs through and adds to list
+                for(String teacher : iterator2.next()){
+                    teachers.add(teacher);
                 }
+                //nest inside subsection
+                subSection.put("instructor", teachers);
+    
+                
             }
             
-            System.out.println(scheduleType.toString());
-            System.out.println(subject.toString());
-            System.out.println(course.toString());
+          
+    
+            main.put("scheduletype", scheduleType);
+            main.put("subject", subject);
+            main.put("Course", course);
+            main.put("section", section);
             
+            System.out.println(main.toString());
+            //result = Jsoner.serialize(main);
             
         } catch (IOException ex) {
             Logger.getLogger(ClassSchedule.class.getName()).log(Level.SEVERE, null, ex);
