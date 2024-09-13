@@ -39,27 +39,75 @@ public class ClassSchedule {
     public String convertCsvToJsonString(List<String[]> csv) {
         String result  = "";
         try {
+           
+            
+            //remvoe later
             CSVReader csvReader = new CSVReader(new StringReader(getCsvString(csv)));
+            CSVReader reader = new CSVReaderBuilder(new StringReader(getCsvString(csv))).withCSVParser(new CSVParserBuilder().withSeparator('\t').build()).build();
+
             List<String[]> full = csvReader.readAll();
-            Iterator<String[]> iterator = full.iterator();
+            //end remove
+            
+            Iterator<String[]> iterator = csv.iterator();
             
             
             
             JsonObject main = new JsonObject();
-            JsonObject schedule = new JsonObject();
+            JsonObject scheduleType = new JsonObject();
+            JsonObject subject = new JsonObject();
             JsonObject course = new JsonObject();
+            
             
             JsonArray section = new JsonArray();
             JsonArray colheaders = new JsonArray();
             
+            
+            //gets headers
             for (String string : iterator.next()){
                 colheaders.add(string);
-               System.out.println(string);
+  
             }
            
-
+                //runs while more
+            while(iterator.hasNext()){
+               
+                String[] rows = iterator.next();
+                
+              
+                if(!scheduleType.containsKey(rows[5])){
+                    scheduleType.put(rows[5], rows[11]);
+                }
+                //testing if num and only abrev, IE acc, is held within subject.
+                String numShort = rows[2].substring(0, rows[2].length()-3);
+                if(!subject.containsKey(numShort)){
+                    subject.put(numShort, rows[1]);
+                }
+                
+                if(!course.containsKey(rows[2])){
+                   
+                    JsonObject subCourse = new JsonObject();
+                    String subjectId = numShort;
+                    String num = rows[2].substring(numShort.length());
+                    int credits = Integer.parseInt(rows[6]);
+                    
+                    //possibly change to use colheaders
+                    subCourse.put("subjectid", subjectId);
+                    subCourse.put("num", numShort);
+                    subCourse.put("description", rows[3]);
+                    subCourse.put("credits", credits);
+                    
+                            
+                    
+                   course.put(rows[2], subCourse);
+                }
+                for(String string : rows){
+                   
+                }
+            }
             
-            
+            System.out.println(scheduleType.toString());
+            System.out.println(subject.toString());
+            System.out.println(course.toString());
             
             
         } catch (IOException ex) {
