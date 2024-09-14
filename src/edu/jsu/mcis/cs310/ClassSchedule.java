@@ -155,6 +155,13 @@ public class ClassSchedule {
     }
     
     public String convertJsonToCsvString(JsonObject json) {
+        String result = "";
+        
+        JsonArray scheduleType = (JsonArray)json.get("scheduletype");
+        JsonArray subject = (JsonArray)json.get("subject");
+        JsonArray course = (JsonArray)json.get("course");
+        JsonArray section = (JsonArray)json.get("section");
+        System.out.println(section);
         
         return ""; // remove this!
         

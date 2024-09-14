@@ -16,14 +16,15 @@ public class Main {
             List<String[]> csvOriginal = schedule.getCsv();
             JsonObject jsonOriginal = schedule.getJson();
             
-            schedule.convertCsvToJsonString(csvOriginal);
+            //schedule.convertCsvToJsonString(csvOriginal);
+            schedule.convertJsonToCsvString(jsonOriginal);
             // Print Total Sections Found in CSV and JSON Data (should be equal)
-            /*
+            
             System.out.println("Sections Found (CSV): " + (csvOriginal.size() - 1));
             
             JsonArray sections = (JsonArray)jsonOriginal.get("section");
             System.out.println("Sections Found (JSON): " + sections.size());
-            */
+            
             
         }
         catch (Exception e) { e.printStackTrace(); }
