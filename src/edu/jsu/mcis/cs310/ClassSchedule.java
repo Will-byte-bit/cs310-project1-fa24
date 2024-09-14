@@ -73,9 +73,10 @@ public class ClassSchedule {
                 String[] rows = iterator.next();
                
                  //testing if num and only abrev, IE acc, is held within subject.
-                String numShort = rows[2].substring(0, rows[2].length()-3);
+                String numShort = rows[2].substring(0, rows[2].length()-4);
                 String subjectId = numShort;
-                String num = rows[2].substring(numShort.length());
+                String num = rows[2].substring(numShort.length()+1);
+               
                 int credits = Integer.parseInt(rows[6]);
                 
               
@@ -116,16 +117,19 @@ public class ClassSchedule {
                 JsonArray teachers = new JsonArray();
                 
                 //creates list of teachers from row data
-                CSVReader reader2 = new CSVReaderBuilder(new StringReader(rows[11])).withCSVParser(new CSVParserBuilder().withSeparator(',').build()).build();
+                CSVReader reader2 = new CSVReaderBuilder(new StringReader(rows[12])).withCSVParser(new CSVParserBuilder().withSeparator(',').build()).build();
                 List<String[]> csv2 = reader2.readAll();
                 Iterator<String[]> iterator2 = csv2.iterator();
                 
                 //runs through and adds to list
                 for(String teacher : iterator2.next()){
-                    teachers.add(teacher);
+                  
+                    teachers.add(teacher.trim());
                 }
+               
                 //nest inside subsection
                 subSection.put("instructor", teachers);
+                section.add(subSection);
     
                 
             }
@@ -134,11 +138,13 @@ public class ClassSchedule {
     
             main.put("scheduletype", scheduleType);
             main.put("subject", subject);
-            main.put("Course", course);
+            main.put("course", course);
             main.put("section", section);
             
-            System.out.println(main.toString());
-            //result = Jsoner.serialize(main);
+           
+            result = Jsoner.serialize(main);
+            result.trim();
+            System.out.println(result);
             
         } catch (IOException ex) {
             Logger.getLogger(ClassSchedule.class.getName()).log(Level.SEVERE, null, ex);
