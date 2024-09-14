@@ -11,6 +11,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -144,7 +145,7 @@ public class ClassSchedule {
            
             result = Jsoner.serialize(main);
             result.trim();
-            System.out.println(result);
+            //System.out.println(result);
             
         } catch (IOException ex) {
             Logger.getLogger(ClassSchedule.class.getName()).log(Level.SEVERE, null, ex);
@@ -155,15 +156,71 @@ public class ClassSchedule {
     }
     
     public String convertJsonToCsvString(JsonObject json) {
-        String result = "";
+
         
-        JsonArray scheduleType = (JsonArray)json.get("scheduletype");
-        JsonArray subject = (JsonArray)json.get("subject");
-        JsonArray course = (JsonArray)json.get("course");
+
+        List<String[]> result = new ArrayList();
+        
+        String[] header = {
+            CRN_COL_HEADER,SUBJECT_COL_HEADER,NUM_COL_HEADER, 
+            DESCRIPTION_COL_HEADER, SECTION_COL_HEADER, TYPE_COL_HEADER, 
+            CREDITS_COL_HEADER, START_COL_HEADER, END_COL_HEADER, DAYS_COL_HEADER,
+            WHERE_COL_HEADER, SCHEDULE_COL_HEADER, INSTRUCTOR_COL_HEADER,
+
+        };
+        result.add(header);
+        System.out.println(header);
+        
+      
+        
+        JsonObject scheduleType = (JsonObject)json.get("scheduletype");
+        JsonObject subject = (JsonObject)json.get("subject");
+        JsonObject course = (JsonObject)json.get("course");
         JsonArray section = (JsonArray)json.get("section");
-        System.out.println(section);
+      
+        for(int i = 0; i < section.size(); i++){
+            String[] main = new String[13];
         
-        return ""; // remove this!
+           JsonObject current = (JsonObject)section.get(i);
+           JsonObject currentCourse = (JsonObject)course.get(current.get("subjectid").toString().concat(" ").concat(current.get("num").toString()));
+           
+           JsonArray teachers = (JsonArray)current.get("instructor");
+           
+           
+            StringWriter writer = new StringWriter();
+            CSVWriter csvWriter = new CSVWriter(writer, '\t', '"', '\\', "\n");
+        
+           main[0] =  current.get("crn").toString();
+           main[1] =  subject.get(current.get("subjectid").toString()).toString();
+           main[2] = current.get("subjectid").toString().concat(" ").concat(current.get("num").toString());
+           main[3] = currentCourse.get("description").toString();
+           main[4] = current.get("section").toString();
+           main[5] = current.get("type").toString();
+           main[6] = currentCourse.get("credits").toString();
+           main[7] = current.get("start").toString();
+           main[8] = current.get("end").toString();
+           main[9] = current.get("days").toString();
+           main[10] = current.get("where").toString();
+           main[11] = scheduleType.get(main[5]).toString();
+           
+           StringBuilder builder = new StringBuilder();
+           for(int t = 0; t < teachers.size(); t++){
+               if(t ==0){
+                   builder.append(teachers.get(t).toString());
+               }
+               else{
+                   builder.append(", ").append(teachers.get(t).toString());
+               }
+           }
+           main[12] = builder.toString();
+           
+          
+          // System.out.print(Arrays.toString(main));
+
+            result.add(main);
+        }
+      
+        return getCsvString(result); // remove this!
         
     }
     
