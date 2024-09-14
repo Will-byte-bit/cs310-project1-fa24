@@ -203,6 +203,8 @@ public class ClassSchedule {
            main[10] = current.get("where").toString();
            main[11] = scheduleType.get(main[5]).toString();
            
+           
+           //main need to change
            StringBuilder builder = new StringBuilder();
            for(int t = 0; t < teachers.size(); t++){
                if(t ==0){
