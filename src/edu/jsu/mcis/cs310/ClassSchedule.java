@@ -40,25 +40,16 @@ public class ClassSchedule {
     public String convertCsvToJsonString(List<String[]> csv) {
         String result  = "";
         try {
-           
-            
-            //remvoe later
-            CSVReader csvReader = new CSVReader(new StringReader(getCsvString(csv)));
-            CSVReader reader = new CSVReaderBuilder(new StringReader(getCsvString(csv))).withCSVParser(new CSVParserBuilder().withSeparator('\t').build()).build();
-
-            List<String[]> full = csvReader.readAll();
-            //end remove
-            
+          
             Iterator<String[]> iterator = csv.iterator();
             
-            
-            
+            //Objects to store data
             JsonObject main = new JsonObject();
             JsonObject scheduleType = new JsonObject();
             JsonObject subject = new JsonObject();
             JsonObject course = new JsonObject();
             
-            
+      
             JsonArray section = new JsonArray();
             JsonArray colheaders = new JsonArray();
             
@@ -92,18 +83,17 @@ public class ClassSchedule {
                 if(!course.containsKey(rows[2])){
                    
                     JsonObject subCourse = new JsonObject();
-      
-                    
+     
                     //possibly change to use colheaders
                     subCourse.put("subjectid", subjectId);
                     subCourse.put("num", num);
                     subCourse.put("description", rows[3]);
                     subCourse.put("credits", credits);
                     
-                            
-                    
                    course.put(rows[2], subCourse);
                 }
+                
+                //placing data in section
                 JsonObject subSection = new JsonObject();
                 subSection.put("crn", Integer.parseInt(rows[0]));
                 subSection.put("subjectid", subjectId);
@@ -132,11 +122,8 @@ public class ClassSchedule {
                 subSection.put("instructor", teachers);
                 section.add(subSection);
     
-                
             }
-            
-          
-    
+           
             main.put("scheduletype", scheduleType);
             main.put("subject", subject);
             main.put("course", course);
@@ -161,6 +148,7 @@ public class ClassSchedule {
 
         List<String[]> result = new ArrayList();
         
+        //base headers
         String[] header = {
             CRN_COL_HEADER,SUBJECT_COL_HEADER,NUM_COL_HEADER, 
             DESCRIPTION_COL_HEADER, SECTION_COL_HEADER, TYPE_COL_HEADER, 
@@ -172,24 +160,22 @@ public class ClassSchedule {
         System.out.println(header);
         
       
-        
+        //all base level objects from json
         JsonObject scheduleType = (JsonObject)json.get("scheduletype");
         JsonObject subject = (JsonObject)json.get("subject");
         JsonObject course = (JsonObject)json.get("course");
         JsonArray section = (JsonArray)json.get("section");
       
         for(int i = 0; i < section.size(); i++){
-            String[] main = new String[13];
+            
+            //individual lines
+           String[] main = new String[13];
         
            JsonObject current = (JsonObject)section.get(i);
            JsonObject currentCourse = (JsonObject)course.get(current.get("subjectid").toString().concat(" ").concat(current.get("num").toString()));
            
            JsonArray teachers = (JsonArray)current.get("instructor");
-           
-           
-            StringWriter writer = new StringWriter();
-            CSVWriter csvWriter = new CSVWriter(writer, '\t', '"', '\\', "\n");
-        
+          
            main[0] =  current.get("crn").toString();
            main[1] =  subject.get(current.get("subjectid").toString()).toString();
            main[2] = current.get("subjectid").toString().concat(" ").concat(current.get("num").toString());
@@ -202,9 +188,9 @@ public class ClassSchedule {
            main[9] = current.get("days").toString();
            main[10] = current.get("where").toString();
            main[11] = scheduleType.get(main[5]).toString();
+     
            
-           
-           //main need to change
+           //breaks up and formats teachers
            StringBuilder builder = new StringBuilder();
            for(int t = 0; t < teachers.size(); t++){
                if(t ==0){
@@ -215,14 +201,11 @@ public class ClassSchedule {
                }
            }
            main[12] = builder.toString();
-           
-          
-          // System.out.print(Arrays.toString(main));
 
             result.add(main);
         }
       
-        return getCsvString(result); // remove this!
+        return getCsvString(result); 
         
     }
     
